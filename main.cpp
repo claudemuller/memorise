@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
                     rect.y = 0;
                     rect.w = 200;
                     rect.y = 200;
-                    SDL_BlitScaled(gButtonSurfaces[i], &rect, gScreenSurface, NULL);
+                    SDL_BlitScaled(gButtonSurfaces[i], NULL, gScreenSurface, &rect);
                 }
 
                 // Update the window
