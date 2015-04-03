@@ -4,8 +4,8 @@
 #include <SDL2/SDL_image.h>
 
 // Constants
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 600;
+const int SCREEN_WIDTH = 1024;
+const int SCREEN_HEIGHT = 768;
 const int BUTTON_IMG_WIDTH = 344;
 const int BUTTON_IMG_HEIGHT = 298;
 const std::string ASSETS_DIR = "assets/";
@@ -25,12 +25,10 @@ SDL_Window* gWindow = NULL;
 SDL_Surface* gScreenSurface = NULL;
 SDL_Surface* gInterfaceSurface = NULL;
 SDL_Surface* gButtonSurfaces[BUTTON_SURFACE_TOTAL];
-int gButtonWidth = 0;
-int gButtonHeight = 0;
+float gButtonWidth, gButtonHeight = 0.0;
 
 struct position {
-    int x;
-    int y;
+    float x, y = 0.0;
 };
 
 position gButtonPositions[BUTTON_SURFACE_TOTAL];

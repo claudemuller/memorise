@@ -38,11 +38,33 @@ int main(int argc, char* argv[])
                     }
                     else if (e.type == SDL_KEYDOWN)
                     {
-                        // Or on 'q' keyboard
-                        if (e.key.keysym.sym == SDLK_q)
-                            bQuit = true;
+                        // Handle keyboard input
+                        switch (e.key.keysym.sym)
+                        {
+                            // 'q' key to quit
+                            case SDLK_q:
+                                bQuit = true;
+                                break;
+                            case SDLK_UP:
+                                std::cout << "Up" << std::endl;
+                                break;
+                            case SDLK_DOWN:
+                                std::cout << "Down" << std::endl;
+                                break;
+                            case SDLK_LEFT:
+                                std::cout << "Left" << std::endl;
+                                break;
+                            case SDLK_RIGHT:
+                                std::cout << "Right" << std::endl;
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
+
+                // White background
+                SDL_FillRect(gScreenSurface, NULL, SDL_MapRGB(gScreenSurface->format, 0xFF, 0xFF, 0xFF));
 
                 // Blit scaled down button surfaces
                 SDL_Rect rect;
@@ -50,12 +72,10 @@ int main(int argc, char* argv[])
                 {
                     rect.x = gButtonPositions[i].x;
                     rect.y = gButtonPositions[i].y;
-                    rect.w = SCREEN_WIDTH / 3;
-                    rect.y = SCREEN_HEIGHT / 3;
+                    rect.w = gButtonWidth;
+                    rect.h = gButtonHeight;
                     SDL_BlitSurface(gButtonSurfaces[i], NULL, gScreenSurface, &rect);
                 }
-
-                // SDL_BlitSurface(gInterfaceSurface, NULL, gScreenSurface, NULL);
 
                 // Update the window
                 SDL_UpdateWindowSurface(gWindow);
@@ -198,36 +218,39 @@ bool loadAssets()
  */
 void calculateSurfaceScale()
 {
-    if (SCREEN_WIDTH > SCREEN_HEIGHT)
+    float nRatio = 0.0;
+
+    if (SCREEN_WIDTH < SCREEN_HEIGHT)
     {
-        gButtonHeight = SCREEN_HEIGHT / 3;
-        gButtonWidth = SCREEN_WIDTH * (3 / SCREEN_HEIGHT);
+        nRatio = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
     }
     else
     {
-        gButtonWidth = SCREEN_WIDTH / 3;
-        gButtonHeight = SCREEN_HEIGHT * (3 / SCREEN_WIDTH);
+        nRatio = (float)SCREEN_HEIGHT / SCREEN_WIDTH ;
     }
 
-    position orangePos;
-    orangePos.x = (SCREEN_WIDTH / 2) - (gButtonWidth / 2);
-    orangePos.y = gButtonWidth;
-    gButtonPositions[BUTTON_SURFACE_ORANGE] = orangePos;
+    // gButtonWidth = (float)BUTTON_IMG_WIDTH / nRatio;
+    // gButtonHeight = (float)BUTTON_IMG_HEIGHT / nRatio;
+    gButtonWidth = BUTTON_IMG_WIDTH;
+    gButtonHeight = BUTTON_IMG_HEIGHT;
 
-    position greenPos;
-    greenPos.x = 0;
-    greenPos.y = (SCREEN_HEIGHT / 2) - (gButtonHeight / 2);
-    gButtonPositions[BUTTON_SURFACE_GREEN] = greenPos;
+    position pos;
 
-    position purplePos;
-    purplePos.x = (SCREEN_WIDTH / 2) - (gButtonWidth / 2);
-    purplePos.y = SCREEN_HEIGHT;
-    gButtonPositions[BUTTON_SURFACE_PURPLE] = purplePos;
+    pos.x = ((float)SCREEN_WIDTH / 2) - (gButtonWidth / 2);
+    pos.y = 0;
+    gButtonPositions[BUTTON_SURFACE_ORANGE] = pos;
 
-    position bluePos;
-    bluePos.x = SCREEN_WIDTH - gButtonWidth;
-    bluePos.y = (SCREEN_HEIGHT / 2) - (gButtonHeight / 2);
-    gButtonPositions[BUTTON_SURFACE_BLUE] = bluePos;
+    pos.x = SCREEN_WIDTH - gButtonWidth;
+    pos.y = ((float)SCREEN_HEIGHT / 2) - (gButtonHeight / 2);
+    gButtonPositions[BUTTON_SURFACE_GREEN] = pos;
+
+    pos.x = ((float)SCREEN_WIDTH / 2) - (gButtonWidth / 2);
+    pos.y = SCREEN_HEIGHT - gButtonHeight;
+    gButtonPositions[BUTTON_SURFACE_PURPLE] = pos;
+
+    pos.x = 0;
+    pos.y = ((float)SCREEN_HEIGHT / 2) - (gButtonHeight / 2);
+    gButtonPositions[BUTTON_SURFACE_BLUE] = pos;
 
 }
 
