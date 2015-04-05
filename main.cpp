@@ -22,8 +22,24 @@ int main(int argc, char* argv[])
         else
         {
             bool bQuit = false;
+            int c = gSequenceLength - 1;
 
             SDL_Event e;
+            SDL_Rect rect;
+
+            timeval t1;
+            for (int i = 0; i < gSequence.size(); i++)
+            {
+                gettimeofday(&t1, NULL);
+                srand(t1.tv_usec * t1.tv_sec);
+
+                gSequence[i] = rand() % gSequenceLength;
+                std::cout << gSequence.at(i) << std::endl;
+            }
+
+            int nTimeNow = time(NULL);
+            int nD = 0;
+            int nCurrentButton = gSequence[nD];
 
             // The infamous "Game Loop"
             while (!bQuit)
@@ -46,35 +62,64 @@ int main(int argc, char* argv[])
                                 bQuit = true;
                                 break;
                             case SDLK_UP:
-                                std::cout << "Up" << std::endl;
-                                break;
-                            case SDLK_DOWN:
-                                std::cout << "Down" << std::endl;
-                                break;
-                            case SDLK_LEFT:
-                                std::cout << "Left" << std::endl;
+                                c = buttonHandler(KEY_PRESS_UP, c);
                                 break;
                             case SDLK_RIGHT:
-                                std::cout << "Right" << std::endl;
+                                c = buttonHandler(KEY_PRESS_RIGHT, c);
+                                break;
+                            case SDLK_DOWN:
+                                c = buttonHandler(KEY_PRESS_DOWN, c);
+                                break;
+                            case SDLK_LEFT:
+                                c = buttonHandler(KEY_PRESS_LEFT, c);
                                 break;
                             default:
                                 break;
                         }
+
+                        if (c < 0)
+                        {
+                            std::cout << "You won!" << std::endl;
+                            bQuit = true;
+                        }
                     }
+                }
+
+                // std::cout << (time(NULL) - nTimeNow) << std::endl;
+
+                int nHeightOffset = 0;
+                if (((time(NULL) - nTimeNow) < gDisplayDuration) && (nD < gSequenceLength))
+                {
+                    nHeightOffset = gButtonHeight / 3;
+                }
+                else
+                {
+                    nTimeNow = time(NULL);
+                    nHeightOffset = 0;
+                    nD++;
+                    nCurrentButton = gSequence.at(nD);
                 }
 
                 // White background
                 SDL_FillRect(gScreenSurface, NULL, SDL_MapRGB(gScreenSurface->format, 0xFF, 0xFF, 0xFF));
 
                 // Blit scaled down button surfaces
-                SDL_Rect rect;
                 for (int i = 0; i < BUTTON_SURFACE_TOTAL; i++)
                 {
                     rect.x = gButtonPositions[i].x;
-                    rect.y = gButtonPositions[i].y;
                     rect.w = gButtonWidth;
-                    rect.h = gButtonHeight;
-                    SDL_BlitSurface(gButtonSurfaces[i], NULL, gScreenSurface, &rect);
+                    if (i == nCurrentButton)
+                    {
+                        rect.y = gButtonPositions[i].y + nHeightOffset;
+                        rect.h = gButtonHeight - nHeightOffset;
+                    }
+                    else
+                    {
+                        rect.y = gButtonPositions[i].y;
+                        rect.h = gButtonHeight;
+                    }
+
+                    SDL_BlitScaled(gButtonSurfaces[i], NULL, gScreenSurface, &rect);
                 }
 
                 // Update the window
@@ -87,6 +132,23 @@ int main(int argc, char* argv[])
     close();
 
     return 0;
+}
+
+int buttonHandler(int pressedKey, int c)
+{
+    std::cout << "Up" << std::endl;
+    std::cout << pressedKey << " - " << gSequence.at(c) << std::endl;
+    if (pressedKey == gSequence.at(c))
+    {
+        std::cout << "yes" << std::endl;
+        c--;
+    }
+    else
+    {
+        c = gSequenceLength - 1;
+    }
+
+    return c;
 }
 
 /**
@@ -251,7 +313,23 @@ void calculateSurfaceScale()
     pos.x = 0;
     pos.y = ((float)SCREEN_HEIGHT / 2) - (gButtonHeight / 2);
     gButtonPositions[BUTTON_SURFACE_BLUE] = pos;
+}
 
+/**
+ * Show sequence to remember
+ *
+ * @TODO    make it work in v0.2
+ */
+std::vector<int> generateSequence(int length)
+{
+    std::vector<int> sequence;
+
+    for (int i = 0; i < length; i++)
+    {
+        sequence.back() = (rand() % length) - BUTTON_SURFACE_ORANGE;
+    }
+
+    return sequence;
 }
 
 /**
